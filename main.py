@@ -1,4 +1,5 @@
 import os
+import time
 import requests
 from dotenv import load_dotenv
 from pytube import YouTube
@@ -48,6 +49,7 @@ if __name__ == "__main__":
     yt_url = "https://youtu.be/1Vk5MhPmnGE?si=FXTRPc78U85K8PBM".strip()
     try:
         video_path = download_youtube_video(yt_url)
+        time.sleep(30)
         upload_video(video_path)
     except Exception as e:
         print(f"❌ Error: {e}")
