@@ -32,6 +32,7 @@ def get_upload_url():
 
 
 def upload_video(file_path):
+    time.sleep(30)
     print(f"Uploading to StreamTape: {file_path}")
     upload_url = get_upload_url()
     with open(file_path, 'rb') as f:
@@ -49,7 +50,6 @@ if __name__ == "__main__":
     yt_url = "https://youtu.be/1Vk5MhPmnGE?si=FXTRPc78U85K8PBM".strip()
     try:
         video_path = download_youtube_video(yt_url)
-        time.sleep(30)
         upload_video(video_path)
     except Exception as e:
         print(f"❌ Error: {e}")
