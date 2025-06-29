@@ -21,7 +21,7 @@ def download_youtube_video(yt_url, output_folder="downloads"):
 
 
 def get_upload_url():
-    url = "https://api.streamtape.com/file/ul?login=79e10358ea0fdad85e40&key=QKkev1xQwmF0ZoQ"
+    url = f"https://api.streamtape.com/file/ul?login={API_LOGIN}&key={API_KEY}"
     response = requests.get(url)
     data = response.json()
     if data['status'] == 200:
