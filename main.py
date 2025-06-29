@@ -1,13 +1,11 @@
 import os
-import time
 import requests
 from dotenv import load_dotenv
 from pytube import YouTube
 
-# Load StreamTape API credentials from .env
+# Load MixDrop API credentials from .env
 load_dotenv()
-API_LOGIN = os.getenv("STREAMTAPE_API_USERNAME")
-API_KEY = os.getenv("STREAMTAPE_API_KEY")
+API_KEY = os.getenv("MIXDROP_API_KEY")  # MixDrop API key (use cookies if needed)
 
 
 def download_youtube_video(yt_url, output_folder="downloads"):
@@ -21,35 +19,33 @@ def download_youtube_video(yt_url, output_folder="downloads"):
     return file_path
 
 
-def get_upload_url():
-    url = f"https://api.streamtape.com/file/ul?login={API_LOGIN}&key={API_KEY}"
-    response = requests.get(url)
-    data = response.json()
-    if data['status'] == 200:
-        return data['result']['url']
-    else:
-        raise Exception("Failed to get upload URL: " + str(data))
+def upload_to_mixdrop(file_path):
+    print(f"Uploading to MixDrop: {file_path}")
+    upload_url = "https://api.mixdrop.co/upload"
 
+    # You may need to pass your session or token via cookies or headers depending on MixDrop auth
+    files = {"file": open(file_path, "rb")}
+    data = {"api_key": API_KEY}  # if MixDrop supports this field, or handle session otherwise
 
-def upload_video(file_path):
-    time.sleep(30)
-    print(f"Uploading to StreamTape: {file_path}")
-    upload_url = get_upload_url()
-    with open(file_path, 'rb') as f:
-        files = {'file1': (os.path.basename(file_path), f)}
-        response = requests.post(upload_url, files=files)
+    response = requests.post(upload_url, files=files, data=data)
+    print("Status Code:", response.status_code)
+    print("Response:", response.text)
+
+    try:
         result = response.json()
-        if result["status"] == 200:
+        if result.get("status") == 200:
             print("✅ Upload Success!")
-            print("🎥 Video URL:", result["result"]["url"])
+            print("🎥 Video URL:", result.get("result", {}).get("url"))
         else:
-            print("❌ Upload Failed:", result)
+            print("❌ Upload failed:", result)
+    except Exception as e:
+        print("❌ Error parsing response:", e)
 
 
 if __name__ == "__main__":
-    yt_url = "https://youtu.be/1Vk5MhPmnGE?si=FXTRPc78U85K8PBM".strip()
+    yt_url = input("🔗 Enter YouTube video URL: ").strip()
     try:
         video_path = download_youtube_video(yt_url)
-        upload_video(video_path)
+        upload_to_mixdrop(video_path)
     except Exception as e:
         print(f"❌ Error: {e}")
