@@ -1,11 +1,24 @@
 import os
 import requests
 from dotenv import load_dotenv
+from pytube import YouTube
 
-# Load API credentials
+# Load StreamTape API credentials from .env
 load_dotenv()
 API_LOGIN = os.getenv("STREAMTAPE_API_USERNAME")
 API_KEY = os.getenv("STREAMTAPE_API_KEY")
+
+
+def download_youtube_video(yt_url, output_folder="downloads"):
+    yt = YouTube(yt_url)
+    video_stream = yt.streams.get_highest_resolution()
+    if not os.path.exists(output_folder):
+        os.makedirs(output_folder)
+    print(f"Downloading YouTube video: {yt.title}")
+    file_path = video_stream.download(output_path=output_folder)
+    print(f"✅ Download complete: {file_path}")
+    return file_path
+
 
 def get_upload_url():
     url = f"https://api.streamtape.com/file/ul?login={API_LOGIN}&key={API_KEY}"
@@ -15,11 +28,10 @@ def get_upload_url():
         return data['result']['url']
     else:
         raise Exception("Failed to get upload URL: " + str(data))
-        
-file_path = "downloads".strip()
+
 
 def upload_video(file_path):
-    print(f"Uploading: {file_path}")
+    print(f"Uploading to StreamTape: {file_path}")
     upload_url = get_upload_url()
     with open(file_path, 'rb') as f:
         files = {'file1': (os.path.basename(file_path), f)}
@@ -31,9 +43,11 @@ def upload_video(file_path):
         else:
             print("❌ Upload Failed:", result)
 
+
 if __name__ == "__main__":
-    file_path = input("📂 Enter full path to video file: ").strip()
-    if os.path.isfile(file_path):
-        upload_video(file_path)
-    else:
-        print("❌ File not found. Please enter a valid path.")
+    yt_url = "https://youtu.be/1Vk5MhPmnGE?si=FXTRPc78U85K8PBM".strip()
+    try:
+        video_path = download_youtube_video(yt_url)
+        upload_video(video_path)
+    except Exception as e:
+        print(f"❌ Error: {e}")
