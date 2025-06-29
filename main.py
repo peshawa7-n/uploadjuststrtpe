@@ -43,7 +43,7 @@ def upload_to_mixdrop(file_path):
 
 
 if __name__ == "__main__":
-    yt_url = input("🔗 Enter YouTube video URL: ").strip()
+    yt_url = "https://youtu.be/1Vk5MhPmnGE?si=FXTRPc78U85K8PBM".strip()
     try:
         video_path = download_youtube_video(yt_url)
         upload_to_mixdrop(video_path)
